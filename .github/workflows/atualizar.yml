@@ -3,6 +3,9 @@ name: Atualizar Etiquetas
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   atualizar:
     runs-on: ubuntu-latest
@@ -25,8 +28,16 @@ jobs:
           PROTHEUS_PASSWORD: ${{ secrets.PROTHEUS_PASSWORD }}
         run: python main.py
 
-      - name: Salvar arquivo Parquet
-        uses: actions/upload-artifact@v4
-        with:
-          name: etiquetas
-          path: data/*.parquet
+      - name: Salvar Parquet no repositorio
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add data/
+
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteracao nos dados."
+          else
+            git commit -m "Atualiza dados de etiquetas"
+            git push
+          fi
