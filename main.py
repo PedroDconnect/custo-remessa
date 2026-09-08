@@ -6,8 +6,8 @@ from datetime import datetime
 
 URL = "https://connectvending144155.protheus.cloudtotvs.com.br:1607/rest/WS_ETIQUETAS/ETIQUETAS"
 
-USER = os.getenv("P.DINIZ")
-PASSWORD = os.getenv("Lagunan2@")
+USER = os.getenv("PROTHEUS_USER")
+PASSWORD = os.getenv("PROTHEUS_PASSWORD")
 
 if not USER or not PASSWORD:
     raise Exception("PROTHEUS_USER ou PROTHEUS_PASSWORD não configurados.")
