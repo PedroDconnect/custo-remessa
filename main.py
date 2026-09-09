@@ -13,17 +13,19 @@ if not USER or not PASSWORD:
     raise Exception("PROTHEUS_USER ou PROTHEUS_PASSWORD não configurados.")
 
 hoje = datetime.now()
-periodo_atual = hoje.strftime("%Y%m")
+
+periodo_inicio = "202606"
+periodo_fim = hoje.strftime("%Y%m")
 
 params = {
     "filial": "01",
-    "perini": periodo_atual,
-    "perfim": periodo_atual,
+    "perini": periodo_inicio,
+    "perfim": periodo_fim,
     "page": 1,
     "pageSize": 13500
 }
 
-print(f"Buscando período: {periodo_atual}")
+print(f"Buscando período: {periodo_inicio} até {periodo_fim}")
 
 todos_registros = []
 
@@ -89,6 +91,16 @@ if "etq_data" in df.columns:
         errors="coerce"
     )
 
+# Filtrar exatamente a partir de 01/06/2026
+if "etq_data" in df.columns:
+    data_inicio = pd.Timestamp("2026-06-01")
+    data_fim = pd.Timestamp(hoje.date())
+
+    df = df[
+        (df["etq_data"] >= data_inicio) &
+        (df["etq_data"] <= data_fim)
+    ]
+
 # Garantir quantidade numérica
 if "etq_qtde" in df.columns:
     df["etq_qtde"] = pd.to_numeric(
@@ -101,7 +113,7 @@ df = df.drop_duplicates()
 
 os.makedirs("data", exist_ok=True)
 
-arquivo = f"data/etiquetas_{periodo_atual}.parquet"
+arquivo = "data/etiquetas_historico.parquet"
 
 con = duckdb.connect()
 
